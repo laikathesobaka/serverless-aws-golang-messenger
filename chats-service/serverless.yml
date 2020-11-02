@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: users
+service: chats
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -119,3 +119,24 @@ functions:
 #     NewOutput:
 #       Description: "Description for the output"
 #       Value: "Some output value"
+
+
+resources:
+  Resources:
+    ChatsTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: chats
+        AttributeDefinitions:
+          - AttributeName: created_date
+            AttributeType: S
+          - AttributeName: created_timestamp
+            AttributeType: N
+        KeySchema:
+          - AttributeName: created_date
+            KeyType: S
+          - AttributeName: created_timestamp
+            AttributeType: N
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
