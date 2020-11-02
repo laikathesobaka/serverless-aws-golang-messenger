@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: chats
+service: sessions
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -119,3 +119,20 @@ functions:
 #     NewOutput:
 #       Description: "Description for the output"
 #       Value: "Some output value"
+
+
+resources:
+  Resources:
+    SessionsTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: sessions
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
