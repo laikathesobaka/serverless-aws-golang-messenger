@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: sessions
+service: chat-app
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -28,8 +28,8 @@ provider:
 #  stage: dev
 #  region: us-east-1
 
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
+
+# iamRoleStatements:
 #    - Effect: "Allow"
 #      Action:
 #        - "s3:ListBucket"
@@ -44,6 +44,19 @@ provider:
 #            - "Ref" : "ServerlessDeploymentBucket"
 #            - "/*"
 
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:Scan
+      Resource: 
+        - "arn:aws:dynamodb:us-east-1:641240258309:table/chats"
+        - "arn:aws:dynamodb:us-east-1:641240258309:table/sessions"
+        - "arn:aws:dynamodb:us-east-1:641240258309:table/users"
+
 # you can define service wide environment variables here
 #  environment:
 #    variable1: value1
@@ -55,18 +68,23 @@ package:
     - ./bin/**
 
 functions:
-  hello:
-    handler: bin/hello
+  create-user:
+    handler: bin/create-user
     events:
       - http:
-          path: hello
-          method: get
-  world:
-    handler: bin/world
+          path: users
+          method: post
+      - cloudwatchLog:
+          logGroup: "/aws/lambda/create-user"
+  login:
+    handler: bin/login
     events:
       - http:
-          path: world
-          method: get
+          path: sessions
+          method: post
+      - cloudWatchLog:
+          logGroup: "/aws/lambda/login"
+          
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -124,14 +142,44 @@ functions:
 resources:
   Resources:
     SessionsTable:
-      Type: "AWS::DynamoDB::Table"
+      Type: AWS::DynamoDB::Table
       Properties:
         TableName: sessions
         AttributeDefinitions:
-          - AttributeName: id
+          - 
+            AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - 
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: users
+        AttributeDefinitions:
+          - AttributeName: username
+            AttributeType: S
+        KeySchema:
+          - AttributeName: username
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    ChatsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: chats
+        AttributeDefinitions:
+          -
+            AttributeName: created_date
+            AttributeType: S
+        KeySchema:
+          - 
+            AttributeName: created_date
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1

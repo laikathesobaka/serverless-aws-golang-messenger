@@ -16,3 +16,8 @@ bin
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+password.go
+password_test.go
+session.go
+timestamp.go
+user.go
