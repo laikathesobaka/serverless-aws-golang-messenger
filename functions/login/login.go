@@ -1,4 +1,4 @@
-package user_session
+package login
 
 import (
 	"crypto/rand"
@@ -23,11 +23,11 @@ func NewLogin(name string) Login {
 	}
 }
 
-func GetLogin(id string, s *session.Session) (Login, error) {
+func GetLogin(sessionID string, s *session.Session) (Login, error) {
 	db := dynamodb.New(s)
 	res, err := db.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String("sessions"),
-		Key:       map[string]*dynamodb.AttributeValue{"id": {S: aws.String(id)}},
+		Key:       map[string]*dynamodb.AttributeValue{"id": {S: aws.String(sessionID)}},
 	})
 	if err != nil {
 		return Login{}, err
@@ -39,7 +39,7 @@ func GetLogin(id string, s *session.Session) (Login, error) {
 	if !ok {
 		return Login{}, fmt.Errorf("Session with username not found")
 	}
-	return Login{SessionID: id, Username: *(username.S)}, nil
+	return Login{SessionID: sessionID, Username: *(username.S)}, nil
 }
 
 func (l Login) Put(s *session.Session) error {

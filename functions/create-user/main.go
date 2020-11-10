@@ -4,8 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
-	"serverless-chat-app/chat_session"
+	"serverless-chat-app/functions/usersess"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -30,15 +29,14 @@ type Result struct {
 }
 
 func handler(ctx context.Context, e Event) (Response, error) {
-	fmt.Println("event --------------", e)
 	s := session.Must(session.NewSession())
-	_, err := chat_session.GetDBUser(e.Username, s)
+	_, err := usersess.GetDBUser(e.Username, s)
 	if err == nil {
 		result := Result{Job: "Add user", Err: "User already exists"}
 		resp, _ := EncodeResponse(result, 500)
 		return resp, nil
 	}
-	user := chat_session.NewUser(e.Username, e.Password)
+	user := usersess.NewUser(e.Username, e.Password)
 	err = user.Put(s)
 	if err != nil {
 		result := Result{

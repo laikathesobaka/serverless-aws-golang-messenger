@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"serverless-chat-app/chat_session"
-	"serverless-chat-app/user_session"
+	"serverless-chat-app/functions/login"
+	"serverless-chat-app/functions/usersess"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -28,7 +28,7 @@ type Result struct {
 
 func handler(ctx context.Context, e Event) (Response, error) {
 	sess := session.Must(session.NewSession())
-	user, err := chat_session.GetDBUserPW(e.Username, e.Password, sess)
+	user, err := usersess.GetDBUserPW(e.Username, e.Password, sess)
 	if err != nil {
 		res := Result{
 			Job: "Login",
@@ -37,7 +37,7 @@ func handler(ctx context.Context, e Event) (Response, error) {
 		resp, _ := EncodeResponse(res, 401)
 		return resp, nil
 	}
-	lg := user_session.NewLogin(e.Username)
+	lg := login.NewLogin(e.Username)
 	err = lg.Put(sess)
 	if err != nil {
 		res := Result{

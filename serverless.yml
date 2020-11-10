@@ -1,3 +1,4 @@
+
 # Welcome to Serverless!
 #
 # This file is the main config file for your service.
@@ -84,7 +85,23 @@ functions:
           method: post
       - cloudWatchLog:
           logGroup: "/aws/lambda/login"
-          
+  chat:
+    handler: bin/chat
+    events:
+      - http:
+          path: chats
+          method: post
+      - cloudWatchLog:
+          logGroup: "/aws/lambda/chat"
+  read:
+    handler: bin/read
+    events:
+      - http:
+          path: chats
+          method: get
+      - cloudWatchLog:
+          logGroup: "/aws/lambda/read"
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -177,10 +194,16 @@ resources:
           -
             AttributeName: created_date
             AttributeType: S
+          -
+            AttributeName: created_timestamp
+            AttributeType: N
         KeySchema:
           - 
             AttributeName: created_date
             KeyType: HASH
+          - 
+            AttributeName: created_timestamp
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
