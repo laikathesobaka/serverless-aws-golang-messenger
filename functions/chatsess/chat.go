@@ -30,19 +30,6 @@ func NewChat(username, text string) Chat {
 	}
 }
 
-// func ChatFromItem(item map[string]*dynamodb.AttributeValue) Chat {
-// 	dateAV := item["created_date"]
-// 	timeAV := item["created_timestamp"]
-// 	usernameAV := item["username"]
-// 	textAV := item["text"]
-// 	return Chat{
-// 		CreatedDate:      *dateAV.S,
-// 		CreatedTimestamp: timestamp.DBtoTime(timeAV.N),
-// 		Username:         *usernameAV.S,
-// 		Text:             *textAV.S,
-// 	}
-// }
-
 func (c Chat) Put(s *session.Session) error {
 	db := dynamodb.New(s)
 	_, err := db.PutItem(&dynamodb.PutItemInput{
@@ -82,10 +69,6 @@ func GetChats(s *session.Session) ([]Chat, error) {
 	}
 	return res, nil
 }
-
-// func convertDBItems(items *[]dynamodb.AttributeValue) []Chat {
-
-// }
 
 func GetChatsAfter(createdDate string, t time.Time, s *session.Session) ([]Chat, error) {
 	db := dynamodb.New(s)
